@@ -40,7 +40,7 @@ public class CommentController {
 	
 	@PostMapping
 	public ResponseEntity<?> insertComment(@Valid @ModelAttribute CommentDTO comment,
-            @RequestParam(name = "file", required = false) MultipartFile file) {
+											@RequestParam(name = "file", required = false) MultipartFile file) {
 		commentService.insertComment(comment, file);
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
 		
@@ -52,9 +52,11 @@ public class CommentController {
 	}
 	
 	@PutMapping("/{commentNo}")
-	public ResponseEntity<?> updateComment(@PathVariable(name = "commentNo") Long commentNo, @Valid @ModelAttribute CommentDTO comment,
-	                                       @RequestParam(name = "file", required = false) MultipartFile file,
-	                                       @RequestParam(name = "commentFileUrl", required = false) String commentFileUrl) {
+	public ResponseEntity<?> updateComment(@PathVariable(name = "commentNo") Long commentNo,
+											@Valid @ModelAttribute CommentDTO comment,
+											@RequestParam(name = "file", required = false) MultipartFile file,
+											@RequestParam(name = "commentFileUrl", required = false) String commentFileUrl,
+											@RequestParam(name = "removeImage", required = false) String removeImage) {
 	    CustomUserDetails userDetails = (CustomUserDetails) authService.getUserDetails();
 	    if (userDetails == null) {
 	        log.warn("인증된 사용자 정보가 없습니다.");
@@ -81,6 +83,13 @@ public class CommentController {
 	        comment.setCommentNo(commentNo);
 	        
 	        if ((file == null || file.isEmpty()) && commentFileUrl != null) {
+	            comment.setCommentFileUrl(commentFileUrl);
+	        }
+	        
+	        if ("true".equals(removeImage)) {
+	            comment.setCommentFileUrl(null);
+	            file = null;
+	        } else if ((file == null || file.isEmpty()) && commentFileUrl != null) {
 	            comment.setCommentFileUrl(commentFileUrl);
 	        }
 	        

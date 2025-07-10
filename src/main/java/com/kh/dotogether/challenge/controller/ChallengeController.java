@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.dotogether.challenge.model.dto.ChallengeDTO;
+import com.kh.dotogether.challenge.model.dto.ChallengePageDTO;
 import com.kh.dotogether.challenge.model.service.ChallengeService;
 import com.kh.dotogether.util.ResponseData;
 
@@ -48,8 +49,8 @@ public class ChallengeController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<ChallengeDTO>> findAll(@RequestParam(name="page",
-														defaultValue="0")
+	public ResponseEntity<ChallengePageDTO> findAll(@RequestParam(name="page",
+														defaultValue="1")
 														int page){
 		return ResponseEntity.ok(challengeService.findAll(page));
 	}
