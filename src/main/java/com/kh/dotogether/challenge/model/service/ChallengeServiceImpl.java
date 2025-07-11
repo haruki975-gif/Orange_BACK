@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.dotogether.auth.model.vo.CustomUserDetails;
 import com.kh.dotogether.auth.service.AuthService;
 import com.kh.dotogether.challenge.model.dao.ChallengeMapper;
 import com.kh.dotogether.challenge.model.dto.ChallengeDTO;
+import com.kh.dotogether.challenge.model.dto.ChallengePageDTO;
 import com.kh.dotogether.challenge.model.vo.Challenge;
 import com.kh.dotogether.file.service.FileService;
 import com.kh.dotogether.profile.model.service.S3Service;
@@ -61,12 +63,18 @@ public class ChallengeServiceImpl implements ChallengeService {
 	}
 
 	@Override
-	public List<ChallengeDTO> findAll(int pageNo) {
+	public ChallengePageDTO findAll(int pageNo) {
 		int size = 10;
-		RowBounds rowBounds = new RowBounds((pageNo - 1) * size, size);
+		int offset = (pageNo - 1) * size;
+		RowBounds rowBounds = new RowBounds(offset, size);
 		List<ChallengeDTO> challenges = challengeMapper.findAll(rowBounds);
-		log.info("이게 오나 안오나 {}", challenges);
-		return challenges;
+		long totalCount = challengeMapper.countAll();
+		int totalPages = (int) Math.ceil((double) totalCount / size);
+		for (int i = 0; i < challenges.size(); i++) {
+	        challenges.get(i).setDisplayNo((int)(totalCount - offset - i));
+	    }
+		
+		return new ChallengePageDTO(challenges, totalPages, totalCount);
 	}
 
 	@Override
@@ -96,6 +104,13 @@ public class ChallengeServiceImpl implements ChallengeService {
 	@Override
 	public void markAsCompleted(Long challengeNo) {
 	    challengeMapper.updateChallengeActive(challengeNo, "N"); // DB에 종료 상태 반영
+	}
+
+	@Override
+	@Transactional
+	public ChallengeDTO findAndIncrementViews(Long challengeNo) {
+		challengeMapper.incrementViewCount(challengeNo);
+        return challengeMapper.findById(challengeNo);
 	}
 
 }

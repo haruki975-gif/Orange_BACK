@@ -17,5 +17,6 @@ public class ChallengePageDTO {
 	
 	private List<ChallengeDTO> challenges;
 	private int totalPages;
+	private long totalCount;
 	
 }

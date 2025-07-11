@@ -1,6 +1,9 @@
 package com.kh.dotogether.challenge.model.vo;
 
-import java.sql.Date;
+
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Builder;
 import lombok.Value;
@@ -16,6 +19,8 @@ public class Challenge {
     private String challengeComment;
     private String challengeFileUrl;
     private String status;
+    private int challengeViews;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Date challengeDate;
     
 }

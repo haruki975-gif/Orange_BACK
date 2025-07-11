@@ -87,6 +87,26 @@ public class CommentServiceImpl implements CommentService {
 	    if (!loginUserNo.equals(commentWriterNo)) {
 	        throw new InvalidUserRequestException("댓글 수정 권한이 없습니다.");
 	    }
+	    
+	    // 새 파일이 있을 때 업로드
+	    if (file != null && !file.isEmpty()) {
+	        // 기존 이미지가 있으면 삭제 (옵션)
+	        if (comment.getCommentFileUrl() != null) {
+	            s3Service.deleteFile(comment.getCommentFileUrl());
+	        }
+	        String filePath = s3Service.uploadFile(file);
+	        comment.setCommentFileUrl(filePath);
+	    } 
+	    // 새 파일 없고, commentFileUrl이 null이라면 기존 이미지 삭제 요청으로 간주
+	    else if (comment.getCommentFileUrl() == null) {
+	        // 기존 이미지 삭제
+	        // DB에 저장된 기존 이미지 URL 조회
+	        String existingFileUrl = commentMapper.selectCommentFileUrl(comment.getCommentNo());
+	        if (existingFileUrl != null) {
+	            s3Service.deleteFile(existingFileUrl);
+	        }
+	        comment.setCommentFileUrl(null);
+	    }
 
 	    if (file != null && !file.isEmpty()) {
 	        String filePath = s3Service.uploadFile(file);
@@ -97,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public void deleteComment(Long commentNo) {
+	public void softDeleteComment(Long commentNo) {
 	    Long loginUserNo = ((CustomUserDetails) authService.getUserDetails()).getUserNo();
 	    Long commentWriterNo = commentMapper.selectCommentWriterNo(commentNo);
 
@@ -105,7 +125,8 @@ public class CommentServiceImpl implements CommentService {
 	        throw new InvalidUserRequestException("댓글 삭제 권한이 없습니다.");
 	    }
 
-	    commentMapper.deleteComment(commentNo);
+	    commentMapper.softDeleteComment(commentNo);
 	}
+
 
 }

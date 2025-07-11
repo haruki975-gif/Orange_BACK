@@ -25,5 +25,6 @@ public class CommentDTO {
 	private LocalDateTime createDate;
 	private Long refBoardNo;
 	private String commentFileUrl;
+	private String isDeleted;
 	
 }

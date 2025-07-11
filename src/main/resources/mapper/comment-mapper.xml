@@ -35,7 +35,8 @@
 	        cc.COMMENT_CONTENT AS commentContent,
 	        cc.COMMENT_DATE AS createDate,
 	        cc.COMMENT_FILE_URL AS commentFileUrl,
-	        cc.COMMENT_WRITER AS commentWriterNo
+	        cc.COMMENT_WRITER AS commentWriterNo,
+	        cc.IS_DELETED AS isDeleted
 	    FROM
 	        TB_CHALLENGE_COMMENT cc
 	    JOIN
@@ -74,4 +75,22 @@
     	WHERE
     		COMMENT_NO = #{commentNo}
 	</delete>
+	
+	<update id="softDeleteComment" parameterType="long">
+		UPDATE
+			TB_CHALLENGE_COMMENT
+		SET
+			IS_DELETED = 'Y'
+		WHERE
+			COMMENT_NO = #{commentNo}
+	</update>
+	
+	<select id="selectCommentFileUrl" parameterType="long" resultType="string">
+    	SELECT
+    		COMMENT_FILE_URL
+    	FROM
+    		TB_CHALLENGE_COMMENT
+    	WHERE
+    		COMMENT_NO = #{commentNo}
+	</select>
 </mapper>

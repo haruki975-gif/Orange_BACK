@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.dotogether.challenge.model.dto.ChallengeDTO;
+import com.kh.dotogether.challenge.model.dto.ChallengePageDTO;
 import com.kh.dotogether.challenge.model.service.ChallengeService;
 import com.kh.dotogether.util.ResponseData;
 
@@ -48,17 +49,10 @@ public class ChallengeController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<ChallengeDTO>> findAll(@RequestParam(name="page",
-														defaultValue="0")
+	public ResponseEntity<ChallengePageDTO> findAll(@RequestParam(name="page",
+														defaultValue="1")
 														int page){
 		return ResponseEntity.ok(challengeService.findAll(page));
-	}
-	
-	@GetMapping("/{no}")
-	public ResponseEntity<ChallengeDTO> findById(@PathVariable(name="no")
-													@Min(value=1, message="작습니다")
-													Long challengeNo){
-		return ResponseEntity.ok(challengeService.findById(challengeNo));
 	}
 	
 	@PutMapping("/{no}")
@@ -75,5 +69,11 @@ public class ChallengeController {
 	public ResponseEntity<Void> complete(@PathVariable(name="no") Long challengeNo) {
 	    challengeService.markAsCompleted(challengeNo); // 상태 변경
 	    return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping("/{no}")
+	public ResponseEntity<ChallengeDTO> getChallengeDetail(@PathVariable(name="no") @Min(value = 1, message = "작습니다") Long challengeNo) {
+	    ChallengeDTO challenge = challengeService.findAndIncrementViews(challengeNo);
+	    return ResponseEntity.ok(challenge);
 	}
 }
