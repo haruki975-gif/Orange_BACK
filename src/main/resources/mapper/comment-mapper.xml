@@ -84,4 +84,13 @@
 		WHERE
 			COMMENT_NO = #{commentNo}
 	</update>
+	
+	<select id="selectCommentFileUrl" parameterType="long" resultType="string">
+    	SELECT
+    		COMMENT_FILE_URL
+    	FROM
+    		TB_CHALLENGE_COMMENT
+    	WHERE
+    		COMMENT_NO = #{commentNo}
+	</select>
 </mapper>

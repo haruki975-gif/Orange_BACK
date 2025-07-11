@@ -21,8 +21,9 @@ public interface CommentMapper {
 	
 	Long selectCommentWriterNo(@Param("commentNo") Long commentNo);
 
-	
 	void updateComment(CommentDTO comment);
+	
+	String selectCommentFileUrl(Long commentNo);
 	
 	void softDeleteComment(Long commentNo);
 	

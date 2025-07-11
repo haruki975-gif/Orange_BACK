@@ -11,6 +11,7 @@ import com.kh.dotogether.auth.model.vo.CustomUserDetails;
 import com.kh.dotogether.auth.service.AuthService;
 import com.kh.dotogether.challenge.model.dao.ChallengeMapper;
 import com.kh.dotogether.challenge.model.dto.ChallengeDTO;
+import com.kh.dotogether.challenge.model.dto.ChallengePageDTO;
 import com.kh.dotogether.challenge.model.vo.Challenge;
 import com.kh.dotogether.file.service.FileService;
 import com.kh.dotogether.profile.model.service.S3Service;
@@ -62,12 +63,18 @@ public class ChallengeServiceImpl implements ChallengeService {
 	}
 
 	@Override
-	public List<ChallengeDTO> findAll(int pageNo) {
+	public ChallengePageDTO findAll(int pageNo) {
 		int size = 10;
-		RowBounds rowBounds = new RowBounds((pageNo - 1) * size, size);
+		int offset = (pageNo - 1) * size;
+		RowBounds rowBounds = new RowBounds(offset, size);
 		List<ChallengeDTO> challenges = challengeMapper.findAll(rowBounds);
-		log.info("이게 오나 안오나 {}", challenges);
-		return challenges;
+		long totalCount = challengeMapper.countAll();
+		int totalPages = (int) Math.ceil((double) totalCount / size);
+		for (int i = 0; i < challenges.size(); i++) {
+	        challenges.get(i).setDisplayNo((int)(totalCount - offset - i));
+	    }
+		
+		return new ChallengePageDTO(challenges, totalPages, totalCount);
 	}
 
 	@Override

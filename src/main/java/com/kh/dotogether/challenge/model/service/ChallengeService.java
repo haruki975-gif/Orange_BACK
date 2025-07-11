@@ -5,12 +5,11 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.dotogether.challenge.model.dto.ChallengeDTO;
+import com.kh.dotogether.challenge.model.dto.ChallengePageDTO;
 
 public interface ChallengeService {
 	
 	void save(ChallengeDTO challenge, MultipartFile file);
-	
-	List<ChallengeDTO> findAll(int pageNo);
 	
 	ChallengeDTO findAndIncrementViews(Long challengeNo);
 	
@@ -20,5 +19,6 @@ public interface ChallengeService {
 	
 	void markAsCompleted(Long challengeNo);
 	
+	ChallengePageDTO findAll(int pageNo);
 	
 }

@@ -13,6 +13,8 @@ import com.kh.dotogether.challenge.model.vo.Challenge;
 @Mapper
 public interface ChallengeMapper {
 	
+	Long countAll();
+	
 	void save(Challenge challenge);
 	
 	List<ChallengeDTO> findAll(RowBounds rb);

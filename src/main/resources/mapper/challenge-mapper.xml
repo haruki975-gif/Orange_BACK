@@ -49,7 +49,7 @@
 			TB_USER ON (CHALLENGE_AUTHOR = USER_NO)
 		ORDER
 		BY
-			CHALLENGE_NO DESC
+			CHALLENGE_DATE DESC
 	</select>
 	
 	<select id="findById"
@@ -82,4 +82,8 @@
 		WHERE
 			CHALLENGE_NO = #{challengeNo}
 	</update>
+	
+	<select id="countAll" resultType="long">
+	    SELECT COUNT(*) FROM TB_CHALLENGE
+	</select>
 </mapper>

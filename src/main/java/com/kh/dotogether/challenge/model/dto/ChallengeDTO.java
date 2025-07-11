@@ -28,5 +28,6 @@ public class ChallengeDTO {
     private int challengeViews;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Date challengeDate;
+    private Integer displayNo;
     
 }
