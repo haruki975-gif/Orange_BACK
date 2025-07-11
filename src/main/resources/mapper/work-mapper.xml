@@ -89,7 +89,15 @@
 		    TB_TEAM_WORK
 		SET
 		    TITLE = #{title},
-		    CONTENT = #{content},
+		    CONTENT = 
+		    <choose>
+		    	<when test=" content == null or ''.equals(content.trim()) ">
+		    		'내용 없음',
+		    	</when>
+		    	<otherwise>
+		    		#{content},
+		    	</otherwise>
+		    </choose>
 		    ASSIGNEE_NO = #{assigneeNo},
 		    END_DATE = TO_DATE(#{endDate}, 'YYYY-MM-DD')
 		WHERE

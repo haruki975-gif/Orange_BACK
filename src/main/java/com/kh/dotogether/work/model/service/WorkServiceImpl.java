@@ -151,16 +151,12 @@ public class WorkServiceImpl implements WorkService {
 		}
 		
 		if(isNullOrEmpty(request.getTitle()) ||
-		   request.getTitle() == null ||	
 		   isNullOrEmpty(request.getAssigneeNo().toString()) ||
 		   isNullOrEmpty(request.getEndDate()) 
 		   ) {
 			return createResponse(request.getRequestUserNo(), "빈 값이 있어 수정에 실패했습니다.");
 		}
 		
-		if(isNullOrEmpty(request.getContent())) {
-			request.setContent("내용 없음");
-		}
 		
 		Work work = Work.builder()
 				.workId(request.getWorkId())
@@ -225,7 +221,7 @@ public class WorkServiceImpl implements WorkService {
 	
 	
 	/**
-	 * 문자열이 null이거나 공백인지 확인
+	 * 응답 DTO 생성
 	 * 
 	 * @param value 검사할 문자열
 	 * @return true = null 또는 빈 문자열, false = 값 존재
