@@ -23,8 +23,8 @@ public class JWTUtil {
 	private SecretKey key;
 	
 	// 엑세스 토큰 시간
-	private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 120; // 2시간
-	//private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 30; // 30분 (나중에 이걸로 수정할 것)
+	//private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 120; // 2시간
+	private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 30; // 30분
 	
 	@PostConstruct
 	public void init() {
@@ -62,6 +62,14 @@ public class JWTUtil {
 	
 	/**
 	 * JWT 토큰 파싱 및 검증
+	 * 파싱: 복잡한 데이터 → 쓸 수 있는 구조로 바꾸기
+	 * JWT 문자열 → 사용자 정보, 권한, 만료일 등을 담은 Claims 객체로 바꾸는 과정
+	 * 파싱하면 객체로 바뀜
+	 * {
+		  "sub": "noeul123",
+		  "role": "USER",
+		  "exp": 1721224080
+		}
 	 */
 	public Claims parseJwt(String token) {
 	    return Jwts.parserBuilder()

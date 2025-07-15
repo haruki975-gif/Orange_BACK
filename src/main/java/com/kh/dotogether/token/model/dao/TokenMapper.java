@@ -11,6 +11,7 @@ import com.kh.dotogether.token.vo.RefreshToken;
 public interface TokenMapper {
 	
 	// 새 리프레시 토큰 저장
+	// RefreshToken 객체의 필드를 사용하므로, XML에선 token.필드명 형식으로 접근
 	void saveToken(@Param("token") RefreshToken token);
 
 	// 리프레시 토큰으로 조회

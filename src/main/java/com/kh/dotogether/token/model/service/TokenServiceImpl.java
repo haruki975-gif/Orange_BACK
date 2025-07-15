@@ -47,7 +47,7 @@ public class TokenServiceImpl implements TokenService {
         // 새 리프레시 토큰 저장
         saveRefreshToken(tokens.get("refreshToken"), member.getUserNo());
 
-        // 만료된 리프레시 토큰 삭제
+        // 만료된 리프레시 토큰 삭제(현재 로그인과 직접 관련 없는 전체 토큰 정리 작업)
         tokenMapper.deleteExpiredRefreshToken(new Date());
 
         return tokens;
