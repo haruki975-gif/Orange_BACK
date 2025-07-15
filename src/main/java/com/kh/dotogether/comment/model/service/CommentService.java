@@ -11,5 +11,5 @@ public interface CommentService {
 	List<CommentDTO> selectCommentList(Long boardNo);
 	CommentDTO update(CommentDTO comment, MultipartFile file);
 	void updateComment(CommentDTO comment, MultipartFile file);
-	void deleteComment(Long commentNo);
+	void softDeleteComment(Long commentNo);
 }

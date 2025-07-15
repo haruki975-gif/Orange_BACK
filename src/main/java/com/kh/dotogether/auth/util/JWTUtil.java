@@ -30,7 +30,7 @@ public class JWTUtil {
 	public void init() {
 		byte[] keyArr = Base64.getDecoder().decode(secretKey);
 		this.key = Keys.hmacShaKeyFor(keyArr);
-		log.info("JWT 시크릿 키 초기화 완료");
+		log.info("JWT 시크릿 키 초기화 완료되었습니다.");
 	}
 	
 	/**

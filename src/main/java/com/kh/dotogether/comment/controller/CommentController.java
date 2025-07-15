@@ -40,7 +40,7 @@ public class CommentController {
 	
 	@PostMapping
 	public ResponseEntity<?> insertComment(@Valid @ModelAttribute CommentDTO comment,
-            @RequestParam(name = "file", required = false) MultipartFile file) {
+											@RequestParam(name = "file", required = false) MultipartFile file) {
 		commentService.insertComment(comment, file);
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
 		
@@ -52,9 +52,11 @@ public class CommentController {
 	}
 	
 	@PutMapping("/{commentNo}")
-	public ResponseEntity<?> updateComment(@PathVariable(name = "commentNo") Long commentNo, @Valid @ModelAttribute CommentDTO comment,
-	                                       @RequestParam(name = "file", required = false) MultipartFile file,
-	                                       @RequestParam(name = "commentFileUrl", required = false) String commentFileUrl) {
+	public ResponseEntity<?> updateComment(@PathVariable(name = "commentNo") Long commentNo,
+											@Valid @ModelAttribute CommentDTO comment,
+											@RequestParam(name = "file", required = false) MultipartFile file,
+											@RequestParam(name = "commentFileUrl", required = false) String commentFileUrl,
+											@RequestParam(name = "removeImage", required = false) String removeImage) {
 	    CustomUserDetails userDetails = (CustomUserDetails) authService.getUserDetails();
 	    if (userDetails == null) {
 	        log.warn("인증된 사용자 정보가 없습니다.");
@@ -84,6 +86,13 @@ public class CommentController {
 	            comment.setCommentFileUrl(commentFileUrl);
 	        }
 	        
+	        if ("true".equals(removeImage)) {
+	            comment.setCommentFileUrl(null);
+	            file = null;
+	        } else if ((file == null || file.isEmpty()) && commentFileUrl != null) {
+	            comment.setCommentFileUrl(commentFileUrl);
+	        }
+	        
 	        commentService.updateComment(comment, file);
 	        return ResponseEntity.ok().body("댓글이 수정되었습니다.");
 	    } catch (Exception e) {
@@ -94,7 +103,7 @@ public class CommentController {
 
 	
 	@DeleteMapping("/{commentNo}")
-	public ResponseEntity<?> deleteComment(@PathVariable(name = "commentNo") Long commentNo) {
+	public ResponseEntity<?> softDeleteComment(@PathVariable(name = "commentNo") Long commentNo) {
 		CustomUserDetails userDetails = (CustomUserDetails) authService.getUserDetails();
 	    Long userNo = userDetails.getUserNo();
 
@@ -105,7 +114,7 @@ public class CommentController {
 	    }
 	    
 	    try {
-	        commentService.deleteComment(commentNo);
+	        commentService.softDeleteComment(commentNo);
 	        return ResponseEntity.ok().body("댓글이 삭제되었습니다.");
 	    } catch (Exception e) {
 	        log.error("댓글 삭제 중 오류", e);

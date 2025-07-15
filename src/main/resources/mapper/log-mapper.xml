@@ -3,45 +3,45 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.dotogether.log.model.dao.LogMapper">
-	<select id="findAll"
-			resultType="com.kh.dotogether.log.model.dto.LogDTO">
-		SELECT
-			L.LOG_NO logNo,
-			U.USER_ID logUserId,
-			U.USER_NAME logUserName,
-			L.LOG_VALUE logValue,
-			L.LOG_DATE logDate
-		FROM
-			TB_LOG L
-		JOIN
-			TB_USER U ON (L.LOG_USER_ID = U.USER_ID)
-		ORDER BY
-			L.LOG_DATE, L.LOG_NO DESC
-	</select>
-	
-	<insert id="insertLog"
-			parameterType="com.kh.dotogether.log.model.dto.LogDTO">
-    	INSERT
-    	INTO
-    		TB_LOG
-    		(
-    	    	LOG_NO,
-    	    	LOG_USER_ID,
-    	    	LOG_USER_NAME,
-    	    	LOG_VALUE,
-    	    	LOG_DATE
-    		)
-    	VALUES
-    		(
-    	    	SEQ_LOG_NO.NEXTVAL,
-    	    	#{logUserId},
-    	    	#{logUserName},
-    	    	#{logValue},
-    	    	SYSDATE
-    		)
-	</insert>
-	
-	<select id="countAll" resultType="int">
-    	SELECT COUNT(*) FROM TB_LOG
-	</select>
+   <select id="findAll"
+         resultType="com.kh.dotogether.log.model.dto.LogDTO">
+      SELECT
+         L.LOG_NO logNo,
+         U.USER_ID logUserId,
+         U.USER_NAME logUserName,
+         L.LOG_VALUE logValue,
+         L.LOG_DATE logDate
+      FROM
+         TB_LOG L
+      JOIN
+         TB_USER U ON (L.LOG_USER_ID = U.USER_ID)
+      ORDER BY
+         L.LOG_DATE DESC
+   </select>
+   
+   <insert id="insertLog"
+         parameterType="com.kh.dotogether.log.model.dto.LogDTO">
+       INSERT
+       INTO
+          TB_LOG
+          (
+              LOG_NO,
+              LOG_USER_ID,
+              LOG_USER_NAME,
+              LOG_VALUE,
+              LOG_DATE
+          )
+       VALUES
+          (
+              SEQ_LOG_NO.NEXTVAL,
+              #{logUserId},
+              #{logUserName},
+              #{logValue},
+              SYSDATE
+          )
+   </insert>
+   
+   <select id="countAll" resultType="int">
+       SELECT COUNT(*) FROM TB_LOG
+   </select>
 </mapper>
