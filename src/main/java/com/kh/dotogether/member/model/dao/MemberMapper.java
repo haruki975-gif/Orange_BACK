@@ -74,7 +74,7 @@ public interface MemberMapper {
      * @return
      */
     MemberDTO findByNameAndEmail(@Param("userName") String userName, @Param("userEmail") String userEmail);
-	MemberDTO findByName(@Param("userName") String userName);
+	List<MemberDTO> findByName(@Param("userName") String userName);
 	
 	/**
 	 * 회원 목록 페이징 조회용
