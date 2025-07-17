@@ -45,6 +45,7 @@
 	</select>
 	
 	
+	
 	<!-- 채팅 메시지 저장 -->
 	<insert id="sendChatMessage"
 			parameterType="MessageDTO">

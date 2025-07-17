@@ -331,7 +331,7 @@
 			TEAM_ID = #{teamId}
 	</delete>
 	
-	<!-- 특정 사용자(teamId 내) 팀원 여부 확인 (팀원일 경우 false, 아닐 경우 true 반환) -->
+	<!-- 팀원인지 검증 (팀원일 경우 false, 아닐 경우 true 반환) -->
 	<select id="findMemberByUserNo"
 			parameterType="Team">
 		SELECT
