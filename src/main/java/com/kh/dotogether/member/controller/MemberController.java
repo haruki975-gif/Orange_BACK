@@ -112,10 +112,10 @@ public class MemberController {
      * @param userEmail
      * @return
      */
-	@GetMapping("/find-id/{userName}")
+	@GetMapping("/find-id")
 	public ResponseEntity<ResponseData> findUserId(
-			@PathVariable("userName") String userName,
-			@RequestParam(name="userEmail") @Email(message="이메일 형식이 올바르지 않습니다.") String userEmail) {
+			@RequestParam("userName") String userName,
+			@RequestParam(name="userEmail") String userEmail) {
 		
 		MemberIdResponseDTO result = memberService.findUserId(userName, userEmail);
 		

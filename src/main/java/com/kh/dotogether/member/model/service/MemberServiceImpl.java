@@ -119,21 +119,17 @@ public class MemberServiceImpl implements MemberService {
 	 */
 	@Override
 	public MemberIdResponseDTO findUserId(String userName, String userEmail) {
-		MemberDTO member = memberMapper.findByName(userName);
+		List<MemberDTO> candidates = memberMapper.findByName(userName);
 
-	    if (member == null) {
-	        throw new CustomException(ErrorCode.NOT_FOUND_USER);
-	    }
-		
-	    // 복호화
-	    String decryptedEmail = encryptionUtil.decrypt(member.getUserEmail());
-
-	    if (!userEmail.equals(decryptedEmail)) {
-	        throw new CustomException(ErrorCode.EMAIL_NOT_MATCH);
+	    for (MemberDTO member : candidates) {
+	        String decrypted = encryptionUtil.decrypt(member.getUserEmail());
+	        if (userEmail.equals(decrypted)) {
+	            log.info("아이디 찾기 성공 - userId: {}", member.getUserId());
+	            return new MemberIdResponseDTO(member.getUserId());
+	        }
 	    }
 
-	    log.info("아이디 찾기 성공 - userId: {}", member.getUserId());
-	    return new MemberIdResponseDTO(member.getUserId());
+	    throw new CustomException(ErrorCode.NOT_FOUND_USER);
 	}
 
 	/**

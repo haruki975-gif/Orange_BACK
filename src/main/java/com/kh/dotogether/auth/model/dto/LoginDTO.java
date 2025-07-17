@@ -8,6 +8,8 @@ import lombok.Data;
 
 @Data
 public class LoginDTO {
+	
+	// 비밀번호 보완
 
 	@NotBlank(message = "아이디는 반드시 입력해야 합니다.")
 	@Pattern(

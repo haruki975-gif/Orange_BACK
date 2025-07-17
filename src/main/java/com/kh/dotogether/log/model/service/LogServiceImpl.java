@@ -35,7 +35,6 @@ public class LogServiceImpl implements LogService {
 	    	log.setLogUserId(logUserId);
 	    	log.setLogUserName(logUserName);
 	    	log.setLogValue(logValue);
-	    	log.setLogDate(new Date());
 	    	
 	    	logMapper.insertLog(log);
 		} catch (Exception e) {

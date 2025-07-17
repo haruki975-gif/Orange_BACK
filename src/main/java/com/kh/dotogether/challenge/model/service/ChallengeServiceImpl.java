@@ -59,7 +59,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 		}
 		
 		challengeMapper.save(requestData);
-		log.info("글이 넘어오나 : {}", requestData);
 	}
 
 	@Override
