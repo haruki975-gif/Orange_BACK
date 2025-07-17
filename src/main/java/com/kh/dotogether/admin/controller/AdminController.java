@@ -79,8 +79,6 @@ public class AdminController {
         String newStatus = body.get("userStatus");
         memberService.updateUserStatus(userId, newStatus);
         String userName = memberService.findByUserId(userId).getUserName();
-        // userId로 유저 정보를 조회하고 (findByUserId) 
-        // 유저 정보에서 userName 꺼내기
     	logService.insertLog(userId, userName, "회원상태 변경");
         return ResponseEntity.ok().build();
     }

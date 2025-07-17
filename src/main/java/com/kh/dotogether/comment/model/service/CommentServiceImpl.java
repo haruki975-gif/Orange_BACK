@@ -33,7 +33,6 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public void insertComment(CommentDTO comment, MultipartFile file) {
-//		challengeService.findById(comment.getRefBoardNo()); << sql 문제있음
 		String tokenUserNo =
 			String.valueOf(((CustomUserDetails)authService.getUserDetails()).getUserNo());
 		
