@@ -19,5 +19,5 @@ public class LogDTO {
 	private String logUserId;
 	private String logUserName;
     private String logValue;
-    private Date logDate;
+    private String logDate;
 }
