@@ -20,6 +20,7 @@ import lombok.ToString;
 public class ScheduleDTO {
 
     private Long scheduleNo;
+    private Long userNo;  
     private Long sectionNo;
 
     @Size(max = 50, message = "제목은 50자 이내로 입력해주세요.")

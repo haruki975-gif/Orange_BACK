@@ -21,6 +21,11 @@ public class CustomUserDetails implements UserDetails {
 	private final String role;
 	private Collection<? extends GrantedAuthority> authorities;
 	
+	// 사용자 이름
+	public String getUserName() {
+	    return this.userName;
+	}
+	
 	@Override
     public String getUsername() {
         return userId;

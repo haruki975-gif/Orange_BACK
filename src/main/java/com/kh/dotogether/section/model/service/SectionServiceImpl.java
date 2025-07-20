@@ -1,12 +1,11 @@
 package com.kh.dotogether.section.model.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import com.kh.dotogether.auth.util.JWTUtil;
 import com.kh.dotogether.exception.exceptions.CustomException;
 import com.kh.dotogether.global.enums.ErrorCode;
-import com.kh.dotogether.member.model.dto.MemberDTO;
-import com.kh.dotogether.member.model.service.MemberService;
 import com.kh.dotogether.schedule.model.dto.ScheduleDTO;
 import com.kh.dotogether.section.model.dao.SectionMapper;
 import com.kh.dotogether.section.model.dto.SectionDTO;
@@ -20,52 +19,37 @@ import lombok.extern.slf4j.Slf4j;
 public class SectionServiceImpl implements SectionService {
 
 	private final SectionMapper sectionMapper;
-	private final MemberService memberService;
-	private final JWTUtil jwtUtil;
 
 	@Override
-	public void setSection(SectionDTO sectionDTO, String authorizationHeader) {
-		Long userNo = extractUserNo(authorizationHeader);
+	public SectionDTO setSection(SectionDTO sectionDTO) {
+	    Long userNo = sectionDTO.getUserNo();
 
-		String title = sectionDTO.getSectionTitle();
+	    String title = sectionDTO.getSectionTitle();
+	    if (title.isBlank()) throw new CustomException(ErrorCode.EMPTY_TITLE);
+	    if (existsByTitle(title, userNo)) throw new CustomException(ErrorCode.DUPLICATE_SECTION_TITLE);
 
-		if (title.isBlank()) {
-			throw new CustomException(ErrorCode.EMPTY_TITLE);
-		}
+	    sectionDTO.setUserNo(userNo);
+	    sectionDTO.setIsBaseSection(existsBaseSection(userNo) ? "N" : "Y");
 
-		if (existsByTitle(title, authorizationHeader)) {
-			throw new CustomException(ErrorCode.DUPLICATE_SECTION_TITLE);
-		}
-
-		sectionDTO.setUserNo(userNo);
-
-		if (existsBaseSection(userNo)) {
-			sectionDTO.setIsBaseSection("N");
-		} else {
-			sectionDTO.setIsBaseSection("Y");
-		}
-
-		sectionMapper.insertSection(sectionDTO);
+	    sectionMapper.insertSection(sectionDTO);
+	    
+	    // 생성된 섹션 정보를 바로 반환
+	    return sectionMapper.findSectionByNo(sectionDTO.getSectionNo(), userNo);
 	}
 
 	@Override
-	public boolean existsByTitle(String sectionTitle, String authorizationHeader) {
-		Long userNo = extractUserNo(authorizationHeader);
+	public boolean existsByTitle(String sectionTitle, Long userNo) {
 		return sectionMapper.existsByTitle(sectionTitle, userNo) > 0;
 	}
 
 	@Override
-	public void updateSectionTitle(SectionDTO sectionDTO, String authorizationHeader) {
-		Long userNo = extractUserNo(authorizationHeader);
+	public void updateSectionTitle(SectionDTO sectionDTO) {
+	    Long userNo = sectionDTO.getUserNo();
 		String title = sectionDTO.getSectionTitle();
 		Long sectionNo = sectionDTO.getSectionNo();
 
-		if (title.isBlank()) {
-			throw new CustomException(ErrorCode.EMPTY_TITLE);
-		}
-		if (existsByTitle(title, authorizationHeader)) {
-			throw new CustomException(ErrorCode.DUPLICATE_SECTION_TITLE);
-		}
+		if (title.isBlank()) throw new CustomException(ErrorCode.EMPTY_TITLE);
+		if (existsByTitle(title, userNo)) throw new CustomException(ErrorCode.DUPLICATE_SECTION_TITLE);
 
 		sectionMapper.updateSectionTitle(title, userNo, sectionNo);
 	}
@@ -74,71 +58,89 @@ public class SectionServiceImpl implements SectionService {
 	public boolean existsBaseSection(Long userNo) {
 		return sectionMapper.countBaseSection(userNo) > 0;
 	}
-	
-	
-	
+
 	@Override
-	public void deleteSection(Long sectionNo, String authorizationHeader) {
-		Long userNo = extractUserNo(authorizationHeader);
-		
-		int sectionCount = sectionMapper.findBySection(userNo);
-		log.info("조회된 섹션 갯수 : {}", sectionCount);
-		
-		if(sectionCount == 0) {	// 섹션이 존재하지 않을 때
-			throw new CustomException(ErrorCode.SECTION_NOT_FOUND);
-		}
-		log.info("조회된 섹션 갯수 : {}", sectionCount);
-		
-		if(sectionCount == 1) {	//섹션이 하나 남았을 때
-			throw new CustomException(ErrorCode.CANNOT_DELETE_LAST_SECTION);
-		}
-		log.info("조회된 섹션 갯수 : {}", sectionCount);
-		
-		reassignBaseAndDelete(sectionNo, userNo);
-		
-	}
-	
-	
-	// 스케줄 이동 메서드
-	private void moveSchedulesToSection(ScheduleDTO scheduleDTO) {
-		
-		
-	}
-	
-	
-	/**
-	 * 기준 섹션으로 업데이트 및 기존 섹션 삭제
-	 * @param sectionNo
-	 * @param userNo
-	 */
-	private void reassignBaseAndDelete(Long sectionNo, Long userNo) {
-		SectionDTO newBaseSection = findLastestSection(sectionNo);
-		newBaseSection.setIsBaseSection("Y");
-		newBaseSection.setUserNo(userNo);
-		
-		sectionMapper.updateBaseSection(newBaseSection);
-		log.info("기준 섹션으로 승격 : {}", newBaseSection);
-		
-		sectionMapper.deleteSection(sectionNo);
-	}
-	
-	/**
-	 * 해당 섹션 다음으로 생성된 섹션
-	 * @param sectionNo
-	 * @return 
-	 */
-	private SectionDTO findLastestSection(Long sectionNo) {
-		SectionDTO newBaseSection = sectionMapper.findLastestSection(sectionNo);
-		return newBaseSection;
-	}
-	
-	
-	private Long extractUserNo(String authorizationHeader) {
-		String token = authorizationHeader.replace("Bearer ", "");
-		String userId = jwtUtil.getUserIdFromToken(token);
-		MemberDTO member = memberService.findByUserId(userId);
-		return member.getUserNo();
+	public List<SectionDTO> findAllSectionsWithSchedules(Long userNo) {
+		return sectionMapper.findAllSectionWithSchedule(userNo);
 	}
 
-	
+	@Override
+	public SectionDTO findSectionWithSchedules(Long sectionNo, Long userNo) {
+		SectionDTO section = sectionMapper.findSectionWithSchedules(sectionNo, userNo);
+		if (section == null) throw new CustomException(ErrorCode.SECTION_NOT_FOUND);
+		return section;
+	}
+
+	@Override
+	public void deleteSection(Long sectionNo, Long userNo) {
+	    // 핵심 디버깅 로그
+	    log.info("=== 섹션 삭제 디버깅 ===");
+	    log.info("getCurrentUserNo() 결과: {}", userNo);
+	    log.info("삭제할 섹션 번호: {}", sectionNo);
+	    
+	    SectionDTO sectionDTO = getSectionWithSchedules(sectionNo, userNo);
+	    int sectionCount = sectionMapper.findBySection(userNo);
+	    
+	    log.info("DB에서 조회한 섹션 개수 (USER_NO={}): {}", userNo, sectionCount);
+	    
+	    // 추가 확인: 실제 81 유저의 섹션 개수도 확인
+	    int actualCount = sectionMapper.findBySection(81L);
+	    log.info("실제 81 유저 섹션 개수: {}", actualCount);
+	    
+	    if (sectionCount == 0) throw new CustomException(ErrorCode.SECTION_NOT_FOUND);
+	    if (sectionCount == 1) throw new CustomException(ErrorCode.CANNOT_DELETE_LAST_SECTION);
+
+		SectionDTO newBaseSection = findLastestSection(sectionNo, userNo); 
+		log.info("다음으로 생성된 섹션 번호 : {}", newBaseSection);
+
+		moveSchedulesToSection(sectionDTO, userNo, newBaseSection);
+
+		if ("Y".equals(sectionDTO.getIsBaseSection())) {
+			reassignBaseAndDelete(sectionNo, userNo, newBaseSection);
+		} else {
+			sectionMapper.deleteSection(sectionNo);
+		}
+	}
+
+
+	private SectionDTO getSectionWithSchedules(Long sectionNo, Long userNo) {
+		SectionDTO section = sectionMapper.findSectionByNo(sectionNo, userNo);
+		List<ScheduleDTO> schedules = sectionMapper.findSchedulesBySectionNo(sectionNo);
+		section.setSchedules(schedules);
+		return section;
+	}
+
+	private void moveSchedulesToSection(SectionDTO sectionDTO, Long userNo, SectionDTO newBaseSection) {
+		List<ScheduleDTO> schedules = sectionDTO.getSchedules();
+		Long sectionNo = sectionDTO.getSectionNo();
+		Long newSectionNo = newBaseSection.getSectionNo();
+
+		if (schedules != null && !schedules.isEmpty()) {
+			sectionMapper.moveSchedulesToSection(newSectionNo, sectionNo, userNo);
+		}
+	}
+
+	private void reassignBaseAndDelete(Long sectionNo, Long userNo, SectionDTO newBaseSection) {
+		newBaseSection.setIsBaseSection("Y");
+		newBaseSection.setUserNo(userNo);
+		sectionMapper.updateBaseSection(newBaseSection);
+		log.info("기준 섹션으로 승격 : {}", newBaseSection);
+		sectionMapper.deleteSection(sectionNo);
+	}
+
+	private SectionDTO findLastestSection(Long sectionNo, Long userNo) {
+		return sectionMapper.findLastestSection(sectionNo, userNo);
+	}
+
+
+	@Override
+	public SectionDTO findSectionByNo(Long sectionNo, Long userNo) {
+	    SectionDTO section = sectionMapper.findSectionByNo(sectionNo, userNo);
+	    if (section == null) {
+	        throw new CustomException(ErrorCode.SECTION_NOT_FOUND);
+	    }
+	    return section;
+	}
+
 }
+

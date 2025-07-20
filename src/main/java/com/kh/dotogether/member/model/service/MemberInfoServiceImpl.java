@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import com.kh.dotogether.auth.util.EncryptionUtil;
 import com.kh.dotogether.exception.exceptions.CustomException;
 import com.kh.dotogether.global.enums.ErrorCode;
+import com.kh.dotogether.log.model.service.LogService;
 import com.kh.dotogether.member.model.dao.MemberInfoMapper;
 import com.kh.dotogether.member.model.dao.MemberMapper;
 import com.kh.dotogether.member.model.dto.MemberAddressDTO;
@@ -25,7 +26,7 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 	private final MemberMapper memberMapper;
 	private final PasswordService passwordService;
 	private final MemberInfoMapper memberInfoMapper;
-
+	private final LogService logService;
 
 	@Override
 	public String findUserPassword(Long userNo, String password) {
@@ -65,6 +66,8 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 	    if (result == 0) {
 	    	throw new CustomException(ErrorCode.USER_UPDATE_FAILED);
 	    }
+	    
+		logService.insertLog(member.getUserId(), member.getUserName(), "회원 비밀번호 변경");
 	}
 	
 	

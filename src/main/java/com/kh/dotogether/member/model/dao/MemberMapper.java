@@ -1,7 +1,10 @@
 package com.kh.dotogether.member.model.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.RowBounds;
 
 import com.kh.dotogether.member.model.dto.MemberDTO;
 
@@ -71,6 +74,21 @@ public interface MemberMapper {
      * @return
      */
     MemberDTO findByNameAndEmail(@Param("userName") String userName, @Param("userEmail") String userEmail);
-	MemberDTO findByName(@Param("userName") String userName);
+	List<MemberDTO> findByName(@Param("userName") String userName);
+	
+	/**
+	 * 회원 목록 페이징 조회용
+	 * @param rowBounds
+	 * @return
+	 */
+	List<MemberDTO> findAll(RowBounds rowBounds);
+	
+	/**
+	 * 전체 회원 수 조회용
+	 * @return
+	 */
+    int countAll();
+    
+    int updateUserStatus(@Param("userId") String userId, @Param("userStatus") String userStatus);
 	
 }

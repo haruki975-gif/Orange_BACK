@@ -28,6 +28,4 @@ public class SectionDTO {
 	private String isBaseSection;
 	private String createdAt;
 	private List<ScheduleDTO> schedules;
-	
-
 }

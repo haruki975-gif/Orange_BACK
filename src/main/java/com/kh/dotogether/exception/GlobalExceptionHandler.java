@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.kh.dotogether.exception.exceptions.CustomException;
+<<<<<<< HEAD
+=======
+import com.kh.dotogether.exception.exceptions.InvalidUserRequestException;
+import com.kh.dotogether.global.enums.ErrorCode;
+>>>>>>> dfcc259cdd39bcf7a3b13c2ecab16cbde6805dea
 import com.kh.dotogether.util.ResponseError;
 
 @RestControllerAdvice
@@ -32,6 +37,7 @@ public class GlobalExceptionHandler {
 		return exceptionHandler(e.getCode(), e.getMessage());
 	}
 	
+<<<<<<< HEAD
 	// @valid 유효성 검증에 실패했을 경우 발생하는 예외 처리
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<?> handleArgumentNotValid(MethodArgumentNotValidException e) {
@@ -45,6 +51,13 @@ public class GlobalExceptionHandler {
 															 .build();
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
+=======
+	@ExceptionHandler(InvalidUserRequestException.class)
+	public ResponseEntity<?> handleInvalidUserError(InvalidUserRequestException e){
+		Map<String, String> error = new HashMap();
+		error.put("error-message", e.getMessage());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+>>>>>>> dfcc259cdd39bcf7a3b13c2ecab16cbde6805dea
 	}
 	
 }

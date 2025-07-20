@@ -4,6 +4,24 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.dotogether.section.model.dao.SectionMapper">
 
+	<resultMap id="sectionWithSchedules" type="com.kh.dotogether.section.model.dto.SectionDTO">
+	    <id property="sectionNo" column="SECTION_NO" />
+	    <result property="userNo" column="USER_NO"/>
+	    <result property="sectionTitle" column="SECTION_TITLE"/>
+	    <result property="isBaseSection" column="IS_BASE_SECTION"/>
+	    <result property="createdAt" column="CREATED_AT"/>
+	    
+	    <collection property="schedules" ofType="com.kh.dotogether.schedule.model.dto.ScheduleDTO">
+	        <id property="scheduleNo" column="SCHEDULE_NO"/>
+	        <result property="scheduleTitle" column="SCHEDULE_TITLE"/>
+	        <result property="scheduleContent" column="SCHEDULE_CONTENT"/>
+	        <result property="startDate" column="START_DATE"/>
+	        <result property="dueDate" column="DUE_DATE"/>
+	    </collection>
+	</resultMap>
+
+
+
 	<!--섹션 제목 중복체크-->
 	<select id="existsByTitle" resultType="int">
 		SELECT
@@ -28,20 +46,39 @@
 			USER_NO = #{userNo}
 	</select>
 	
+	
+	<select id="selectBaseSectionNoByUserNo" resultType="long">
+		  SELECT 
+		  	SECTION_NO
+		  FROM 
+		  	TB_SECTION
+		  WHERE 
+		  	USER_NO = #{userNo}
+	      AND 
+	      	IS_BASE_SECTION = 'Y'
+		  FETCH 
+		  	FIRST 1 ROWS ONLY
+	</select>
+	
 	<!--섹션 추가-->
-	<insert id="insertSection">
-		INSERT INTO TB_SECTION (
-		    SECTION_NO,
-		    USER_NO,
-		    SECTION_TITLE,
-		    IS_BASE_SECTION
-		) VALUES (
-		    SEQ_SECTION_NO.NEXTVAL,
-		    #{userNo},
-		    #{sectionTitle},
-		    #{isBaseSection}
-		)
+	<insert id="insertSection" parameterType="SectionDTO" keyProperty="sectionNo" keyColumn="SECTION_NO">
+	    <selectKey keyProperty="sectionNo" resultType="long" order="BEFORE">
+	        SELECT SEQ_SECTION_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	    
+	    INSERT INTO TB_SECTION (
+	        SECTION_NO,
+	        USER_NO,
+	        SECTION_TITLE,
+	        IS_BASE_SECTION
+	    ) VALUES (
+	        #{sectionNo},
+	        #{userNo},
+	        #{sectionTitle},
+	        #{isBaseSection}
+	    )
 	</insert>
+
 	
 	<update id="updateSectionTitle">
 		UPDATE
@@ -76,6 +113,8 @@
 				TB_SECTION
 			WHERE 
 				SECTION_NO != #{sectionNo}
+			AND 
+            	USER_NO = #{userNo}
 			ORDER BY 
 				CREATED_AT ASC
 		)
@@ -96,10 +135,95 @@
 	<delete id="deleteSection">
 		DELETE
 		  FROM
-		        TB_SECTION
+	        TB_SECTION
 		 WHERE
-	        	SECTION_NO = #{sectionNo}        	
+        	SECTION_NO = #{sectionNo}        	
 	</delete>
+	
+	<update id="moveSchedulesToSection">
+		UPDATE
+			TB_SCHEDULE
+	    SET
+	   	  	SECTION_NO = #{newSectionNo}
+		WHERE
+			SECTION_NO = #{sectionNo}
+		
+	</update>
+	
+	<select id="findSectionByNo" resultType="SectionDTO">
+		SELECT 
+			SECTION_NO, 
+			USER_NO, 
+			SECTION_TITLE, 
+			IS_BASE_SECTION, 
+			CREATED_AT
+		FROM 
+			TB_SECTION
+		WHERE 
+			SECTION_NO = #{sectionNo}
+		AND USER_NO = #{userNo}
+	</select>
+	
+	<select id="findSchedulesBySectionNo" resultType="ScheduleDTO">
+		SELECT *
+		FROM 
+			TB_SCHEDULE
+		WHERE 
+			SECTION_NO = #{sectionNo}
+	</select>
+	
+	
+	<select id="findAllSectionWithSchedule" resultMap="sectionWithSchedules">
+	    SELECT 
+	        S.SECTION_NO,
+	        S.USER_NO,
+	        S.SECTION_TITLE,
+	        S.IS_BASE_SECTION,
+	        S.CREATED_AT,
+	        SCH.SCHEDULE_NO,
+	        SCH.SCHEDULE_TITLE,
+	        SCH.SCHEDULE_CONTENT,
+	        SCH.START_DATE,
+	        SCH.DUE_DATE
+	    FROM 
+	    	TB_SECTION S
+	    LEFT JOIN 
+	    	TB_SCHEDULE SCH 
+    	ON 
+    		S.SECTION_NO = SCH.SECTION_NO
+	    WHERE 
+	    	S.USER_NO = #{userNo}
+	    ORDER BY 
+	    	S.CREATED_AT
+	</select>
+	
+	<select id="findSectionWithSchedules" resultMap="sectionWithSchedules">
+		SELECT 
+		    S.SECTION_NO,
+		    S.USER_NO,
+		    S.SECTION_TITLE,
+		    S.IS_BASE_SECTION,
+		    S.CREATED_AT,
+		    SCH.SCHEDULE_NO,
+		    SCH.SCHEDULE_TITLE,
+		    SCH.SCHEDULE_CONTENT,
+		    SCH.START_DATE,
+		    SCH.DUE_DATE,
+		    SCH.IS_COMPLETED,
+		    SCH.CREATED_AT AS SCHEDULE_CREATED_AT
+		FROM 
+		    TB_SECTION S
+		LEFT JOIN 
+		    TB_SCHEDULE SCH 
+		ON 
+		    S.SECTION_NO = SCH.SECTION_NO
+		WHERE 
+		    S.SECTION_NO = #{sectionNo}
+		AND 
+		    S.USER_NO = #{userNo}
+	</select>
+
+
 	
 
 </mapper>

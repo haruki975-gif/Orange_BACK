@@ -2,6 +2,8 @@ package com.kh.dotogether.auth.service;
 
 import java.util.Map;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,6 @@ import com.kh.dotogether.exception.exceptions.CustomException;
 import com.kh.dotogether.global.enums.ErrorCode;
 import com.kh.dotogether.member.model.dao.MemberMapper;
 import com.kh.dotogether.member.model.dto.MemberDTO;
-import com.kh.dotogether.password.service.PasswordService;
 import com.kh.dotogether.token.model.service.TokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,40 +28,40 @@ public class AuthServiceImpl implements AuthService {
 	private final TokenService tokenService;
 	private final JWTUtil jwtUtil;
 	private final MemberMapper memberMapper;
-	private final PasswordService passwordService;
+	private final AuthenticationManager authenticationManager;
 	
 	@Override
 	public Map<String, String> login(LoginDTO loginDTO) {
 		
-		// 사용자 조회
-	    MemberDTO user = memberMapper.findByUserId(loginDTO.getUserId());
-	    if (user == null) {
-	        throw new CustomException(ErrorCode.NOT_FOUND_USER);
-	    }
-	    
-	    // 탈퇴 회원 확인
-	    if ("N".equals(user.getUserStatus())) {
-	    	throw new CustomException("E104","이미 탈퇴한 회원입니다.");
-	    }
-
-	    // 비밀번호 검증
-	    if (!passwordService.matches(loginDTO.getUserPw(), user.getUserPw())) {
-	        throw new CustomException(ErrorCode.INVALID_LOGIN_INFO);
-	    }
-	    
-		log.info("로그인 성공!");
-		log.info("인증된 사용자 정보: {}", user);
+		// 사용자가 입력한 아이디 / 비밀번호를 담는 인증용 토큰 객체를 생성함. 
+		// 이건 아직 인증되지 않은 상태 (→ 검증 필요)
+		UsernamePasswordAuthenticationToken authToken =
+				new UsernamePasswordAuthenticationToken(loginDTO.getUserId(), loginDTO.getUserPw());
+		// 여기 예외처리해줘야함(45행까지)
 		
-		// 토큰 발급
+		// AuthenticationManager가 이 토큰을 가지고
+		// → 내부적으로 **UserDetailsServiceImpl**를 호출함
+		// → DB에서 유저 정보 조회 & 비밀번호 일치 확인
+		Authentication authentication = authenticationManager.authenticate(authToken);
+		
+		// 인증 성공 → 인증된 사용자 정보 꺼내기
+		// 사용자 정보 클래스(CustomUserDetails)에 userId, userNo, userName, role 등을 담음
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+	    
+		log.info("로그인 성공 - 사용자 ID: {}", userDetails.getUserId());
+		
+		// JWT 토큰을 발급하는 메서드 호출
+		// 여기서 accessToken과 refreshToken이 만들어짐
+		// 결과는 Map 형태로 반환됨 (Map<String, String>)
 		Map<String, String> loginResponse = tokenService.generateToken(
-				user.getUserId(), user.getUserRole()
+				userDetails.getUserId(), userDetails.getRole()
 		);
 		
 		// 사용자 정보 추가
-		loginResponse.put("userNo", String.valueOf(user.getUserNo()));
-		loginResponse.put("userId", user.getUserId());
-		loginResponse.put("userName", user.getUserName());
-		loginResponse.put("userRole", user.getUserRole());
+		loginResponse.put("userNo", String.valueOf(userDetails.getUserNo()));
+		loginResponse.put("userId", userDetails.getUserId());
+		loginResponse.put("userName", userDetails.getUserName());
+		loginResponse.put("userRole", userDetails.getRole());
 		
 		return loginResponse;
 	}

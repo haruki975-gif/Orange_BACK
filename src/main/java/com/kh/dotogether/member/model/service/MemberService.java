@@ -1,5 +1,7 @@
 package com.kh.dotogether.member.model.service;
 
+import java.util.List;
+
 import com.kh.dotogether.member.model.dto.MemberDTO;
 import com.kh.dotogether.member.model.dto.MemberIdResponseDTO;
 
@@ -68,5 +70,16 @@ public interface MemberService {
      * @return
      */
     MemberIdResponseDTO findUserId(String userName, String userEmail);
+    
+    List<MemberDTO> findAll(int page, int size);
+    int countAll();
+    
+    /**
+     * 회원 상태 업데이트 (활동중 'Y' / 정지 'N')
+     * @param userId
+     * @param newStatus
+     * @return 업데이트 성공 여부
+     */
+    boolean updateUserStatus(String userId, String newStatus);
 
 }

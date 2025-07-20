@@ -144,4 +144,33 @@
 		 WHERE
 		 		USER_NAME = #{userName}
 	</select>
+	
+	<select id="findAll" resultType="com.kh.dotogether.member.model.dto.MemberDTO">
+    	SELECT
+    	    USER_ID,
+    	    USER_NAME,
+    	    USER_PHONE,
+    	    USER_EMAIL,
+    	    USER_ADDRESS1,
+    	    JOIN_DATE,
+    	    USER_STATUS
+    	FROM
+    		TB_USER
+    	ORDER BY
+    		JOIN_DATE DESC
+	</select>
+
+	<select id="countAll" resultType="int">
+    	SELECT COUNT(*) FROM TB_USER
+	</select>
+	
+	<update id="updateUserStatus">
+    	UPDATE
+    		TB_USER
+    	SET
+			USER_STATUS = #{userStatus},
+			UPDATE_DATE = SYSDATE
+    	WHERE
+    		USER_ID = #{userId}
+	</update>
 </mapper>

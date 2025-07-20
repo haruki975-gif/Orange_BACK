@@ -4,5 +4,89 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.dotogether.schedule.model.dao.ScheduleMapper">
 
+	<insert id="insertSchedule" parameterType="ScheduleDTO">
+	  <selectKey resultType="long" keyProperty="scheduleNo" order="AFTER">
+	    SELECT SEQ_SCHEDULE_NO.CURRVAL FROM DUAL
+	  </selectKey>
+	
+	  INSERT INTO TB_SCHEDULE (
+	        SCHEDULE_NO,
+	        USER_NO,
+	        SECTION_NO,
+	        SCHEDULE_TITLE,
+	        START_DATE,
+	        DUE_DATE
+	  ) VALUES (
+	        SEQ_SCHEDULE_NO.NEXTVAL,
+	        #{userNo},
+	        #{sectionNo},
+	        #{scheduleTitle},
+	        #{startDate},
+	        #{dueDate}
+	  )
+	</insert>
+
+
+	
+	<select id="findScheduleById">
+		SELECT
+			SCHEDULE_NO,
+		    SECTION_NO,
+		    USER_NO,
+		    SCHEDULE_TITLE,
+		    SCHEDULE_CONTENT,
+		    START_DATE,
+		    DUE_DATE,
+		    IS_COMPLETED
+	    FROM
+	    	TB_SCHEDULE
+    	WHERE
+    		SCHEDULE_NO = #{scheduleNo}
+		AND
+			USER_NO = #{userNo}
+	</select>
+	
+	<update id="updateSchedule">
+		UPDATE
+			TB_SCHEDULE
+	    SET
+	   	  	SCHEDULE_TITLE = #{scheduleTitle},
+	   	  	SCHEDULE_CONTENT = #{scheduleContent},
+	   	  	START_DATE = #{startDate},
+	   	  	DUE_DATE = #{dueDate},
+	   	  	IS_COMPLETED = #{isCompleted}
+		WHERE
+	  		USER_NO = #{userNo}
+  		AND
+  			SCHEDULE_NO = #{scheduleNo}
+		AND
+			SECTION_NO = #{sectionNo}
+	</update>
+	
+	<delete id="deleteSchedule">
+		DELETE
+		  FROM
+	        TB_SCHEDULE
+		 WHERE
+        	SCHEDULE_NO = #{scheduleNo}        
+		AND
+			USER_NO = #{userNo}	
+	</delete>
+	
+	
+	<update id="updateScheduleSection">
+	    UPDATE 
+	    	TB_SCHEDULE
+	    SET 
+	    	SECTION_NO = #{targetSectionNo}
+	    WHERE 
+	    	SCHEDULE_NO = #{scheduleNo}
+	    AND 
+	    	USER_NO = #{userNo}
+	</update>
+
+	
+
+	
 
 </mapper>
