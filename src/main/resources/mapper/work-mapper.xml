@@ -13,7 +13,8 @@
 		    USER_NAME assigneeName,
 		    END_DATE endDate,
 		    STATUS status,
-		    PROFILE_IMG assigneeProfile
+		    PROFILE_IMG assigneeProfile,
+		    VERSION version
 		FROM
 		    TB_TEAM_WORK W
 		JOIN
@@ -76,9 +77,12 @@
 		    TB_TEAM_WORK
 		SET
 		    STATUS = #{status},
-		    UPDATED_AT = SYSDATE
+		    UPDATED_AT = SYSDATE,
+		    VERSION = VERSION + 1
 		WHERE
 		    WORK_ID = #{workId}
+		AND
+			VERSION = #{version}
 	</update>
 	
 	
@@ -106,5 +110,18 @@
 		WHERE
 			WORK_ID = #{workId}
 	</delete>
+	
+<!--	<select id="findWorkByStatus"
+			parameterType="WorkDTO"
+			resultType="boolean">
+		SELECT
+			DECODE(COUNT(*), 0, 1, 0)
+		FROM
+			TB_TEAM_WORK
+		WHERE
+			WORK_ID = #{workId}
+		AND
+			STATUS = #{prevStatus}
+	</select>-->
 
 </mapper>

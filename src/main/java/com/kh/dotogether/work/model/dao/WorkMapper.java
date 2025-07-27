@@ -72,4 +72,7 @@ public interface WorkMapper {
 	 */
 	int deleteWorkByWorkNo(String workId);
 	
+	
+	boolean findWorkByStatus(WorkDTO work);
+	
 }

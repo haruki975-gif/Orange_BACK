@@ -115,6 +115,7 @@ public class WorkServiceImpl implements WorkService {
 		Work work = Work.builder()
 						.workId(request.getWorkId())
 						.status(request.getStatus())
+						.version(request.getVersion())
 						.build();
 		
 		
@@ -133,6 +134,49 @@ public class WorkServiceImpl implements WorkService {
 		
 		return responseWork;
 	}
+	
+	
+	/**
+	 * 업무 상태 변경 (ex: TODO → DOING)
+	 * 
+	 * @param request 변경할 업무 정보 (workId, status 포함)
+	 * @return 변경된 업무 정보 또는 실패 메시지
+	 */
+//	@Override
+//	public WorkDTO updateWorkStatus(WorkDTO request) {
+//		
+//		String isTeamMember = teamValidator.isTeamMember(
+//				request.getTeamId(), request.getRequestUserNo());
+//				
+//		if(isTeamMember != null) {
+//			return createResponse(request.getRequestUserNo(), isTeamMember);
+//		}
+//		
+//		Work work = Work.builder()
+//						.workId(request.getWorkId())
+//						.status(request.getStatus())
+//						.build();
+//		
+//		if(workMapper.findWorkByStatus(request)) {
+//			return createResponse(request.getRequestUserNo(), "업무 상태가 이미 변경되었습니다.");
+//		}
+//		
+//		int updateWorkStatus = workMapper.updateWorkStatus(work);
+//		
+//		if(updateWorkStatus == 0) {
+//			return createResponse(request.getRequestUserNo(), "업무 상태 수정에 실패했습니다.");
+//		}
+//		
+//		WorkDTO responseWork = workMapper.findWorkByWorkId(request.getWorkId());
+//		
+//		responseWork.setType("statusUpdate");
+//		responseWork.setRequestUserNo(request.getRequestUserNo());
+//		
+//		responseWork.setPrevStatus(request.getPrevStatus());
+//		
+//		return responseWork;
+//	}
+
 
 	
 	/**
