@@ -29,4 +29,6 @@ public class WorkDTO {
 
 	private String type;
 	
+	private Long version;
+	
 }

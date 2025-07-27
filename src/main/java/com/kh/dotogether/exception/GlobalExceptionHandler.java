@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -26,17 +27,34 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
 	}
 	
+	// 로직실행 중 발생하는 예외 처리
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<ResponseError> handleCustomException(CustomException e){
 		
 		return exceptionHandler(e.getCode(), e.getMessage());
 	}
 	
+	// @valid 유효성 검증에 실패했을 경우 발생하는 예외 처리
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<?> handleArgumentNotValid(MethodArgumentNotValidException e) {
+		
+		Map<String, String> errors = new HashMap<>();
+		
+		e.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+		
+		ResponseError responseError = ResponseError.builder().code("106")
+															 .messages(errors)
+															 .build();
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
+	}
+
 	@ExceptionHandler(InvalidUserRequestException.class)
 	public ResponseEntity<?> handleInvalidUserError(InvalidUserRequestException e){
 		Map<String, String> error = new HashMap();
 		error.put("error-message", e.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+
 	}
 	
 }

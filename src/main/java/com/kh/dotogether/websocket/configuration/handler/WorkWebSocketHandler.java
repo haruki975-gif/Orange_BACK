@@ -73,7 +73,6 @@ public class WorkWebSocketHandler extends TextWebSocketHandler{
 				user.sendMessage(textMessage);
 			}
 		}
-
 	}
 	
 	@Override

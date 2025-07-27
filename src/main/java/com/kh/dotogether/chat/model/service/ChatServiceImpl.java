@@ -87,7 +87,6 @@ public class ChatServiceImpl implements ChatService {
 			return createResponse(message.getSenderNo(), "빈 문자 메시지는 전송이 불가능합니다.");
 		}
 		
-		
 		String validateTeamAndMember = 
 				teamValidator.isTeamMember(message.getTeamId(), message.getSenderNo());
 		

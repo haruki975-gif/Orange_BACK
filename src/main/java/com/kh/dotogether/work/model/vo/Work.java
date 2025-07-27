@@ -28,4 +28,6 @@ public class Work {
 	private String endDate;
 	
 	private String status;
+	
+	private Long version;
 }
