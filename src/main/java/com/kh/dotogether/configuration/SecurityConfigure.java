@@ -79,7 +79,11 @@ public class SecurityConfigure {
                 .requestMatchers("/api/members/check-email/**").permitAll()
                 .requestMatchers("/api/members/check-phone/**").permitAll()
                 .requestMatchers("/api/members/find-pw/**").permitAll()                
-                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/ws/**", 
+                				 "/swagger-ui.html",
+                				 "/swagger-ui/**",
+                				 "/api-docs/**",
+                				 "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/teams").permitAll()
                 // 관리자 권한
                 .requestMatchers("/api/admin/**").authenticated()
